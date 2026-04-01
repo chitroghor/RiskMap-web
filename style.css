@@ -1,0 +1,88 @@
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f5f7fb;
+  margin: 0;
+}
+
+.navbar {
+  padding: 15px;
+  background: white;
+  text-align: center;
+  font-weight: bold;
+}
+
+.hero {
+  text-align: center;
+  padding: 50px;
+}
+
+.card {
+  background: white;
+  max-width: 700px;
+  margin: 20px auto;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+input {
+  width: 100%;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+button {
+  padding: 10px;
+  margin-top: 10px;
+  background: #4285F4;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.secondary {
+  background: #e8eaed;
+  color: black;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+td, th {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+tr:hover {
+  background: #f1f3f4;
+  cursor: pointer;
+}
+
+.links {
+  list-style: none;
+  padding: 0;
+}
+
+.links li {
+  margin: 10px 0;
+}
+
+a {
+  color: #4285F4;
+  text-decoration: none;
+}
+
+.note {
+  color: #5f6368;
+}
+
+.hint {
+  color: gray;
+  font-size: 0.9rem;
+}

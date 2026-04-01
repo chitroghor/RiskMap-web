@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RiskMap</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<nav class="navbar">RiskMap</nav>
+
+<header class="hero">
+  <h1>Disaster Risk Assessment</h1>
+  <p>Use real government-backed data for accurate insights</p>
+</header>
+
+<!-- INPUT -->
+<section class="card">
+  <h2>Enter Area Data</h2>
+
+  <label>Hazard Level</label>
+  <input type="range" id="hazard" min="0" max="100" value="50">
+  <span id="hazardValue"></span>
+
+  <input type="number" id="population" placeholder="Population Density">
+  <input type="number" id="infra" placeholder="Infrastructure Quality (1-100)">
+  <input type="number" id="capacity" placeholder="Drainage Capacity (1-100)">
+
+  <button onclick="calculateRisk()">Calculate Risk</button>
+  <button class="secondary" onclick="fillSample()">Auto Fill Example</button>
+
+  <h3 id="result">--</h3>
+</section>
+
+<!--  CITY DATA TABLE -->
+<section class="card">
+  <h2> Example Data (Indian Cities)</h2>
+
+  <table>
+    <tr>
+      <th>City</th>
+      <th>Population Density</th>
+      <th>Infra Score</th>
+      <th>Drainage</th>
+    </tr>
+
+    <tr onclick="selectCity(11000,85,70)">
+      <td>Delhi</td><td>11000+</td><td>85</td><td>70</td>
+    </tr>
+
+    <tr onclick="selectCity(20000,75,50)">
+      <td>Mumbai</td><td>20000+</td><td>75</td><td>50</td>
+    </tr>
+
+    <tr onclick="selectCity(8000,80,75)">
+      <td>Bangalore</td><td>8000</td><td>80</td><td>75</td>
+    </tr>
+
+    <tr onclick="selectCity(26000,70,40)">
+      <td>Kolkata</td><td>26000+</td><td>70</td><td>40</td>
+    </tr>
+
+    <tr onclick="selectCity(7000,78,65)">
+      <td>Chennai</td><td>7000</td><td>78</td><td>65</td>
+    </tr>
+  </table>
+
+  <p class="hint">Click any city to auto-fill values</p>
+</section>
+
+<!--  OFFCIAL DATA LINKS -->
+<section class="card">
+  <h2> Official Government Data Sources</h2>
+
+  <ul class="links">
+    <li>
+      Population Data:
+      <a href="https://censusindia.gov.in/" target="_blank">Census India</a>
+    </li>
+
+    <li>
+      Hazard (Rainfall/Floods):
+      <a href="https://mausam.imd.gov.in/" target="_blank">IMD (Govt. of India)</a>
+    </li>
+
+    <li>
+      Infrastructure Data:
+      <a href="https://smartcities.gov.in/" target="_blank">Smart Cities Mission</a>
+    </li>
+
+    <li>
+      Drainage & Flood Reports:
+      <a href="https://ndma.gov.in/" target="_blank">NDMA</a>
+    </li>
+  </ul>
+
+  <p class="note">
+    These are official government websites. Use them to estimate values for your area.
+  </p>
+</section>
+
+<!-- REPORT -->
+<section class="report">
+  <button onclick="generateReport()">Download Full Report</button>
+</section>
+
+<script src="script.js"></script>
+</body>
+</html>
