@@ -23,21 +23,20 @@
 
   <label>Hazard Level</label>
   <input type="range" id="hazard" min="0" max="100" value="50">
-  <span id="hazardValue"></span>
+  <span id="hazardValue">50</span>
 
-  <input type="number" id="population" placeholder="Population Density">
+  <input type="number" id="population" placeholder="Population Density (people/km²)">
   <input type="number" id="infra" placeholder="Infrastructure Quality (1-100)">
   <input type="number" id="capacity" placeholder="Drainage Capacity (1-100)">
 
   <button onclick="calculateRisk()">Calculate Risk</button>
-  <button class="secondary" onclick="fillSample()">Auto Fill Example</button>
 
   <h3 id="result">--</h3>
 </section>
 
-<!--  CITY DATA TABLE -->
+<!-- CITY DATA TABLE -->
 <section class="card">
-  <h2> Example Data (Indian Cities)</h2>
+  <h2>Example Data (Indian Cities)</h2>
 
   <table>
     <tr>
@@ -68,12 +67,12 @@
     </tr>
   </table>
 
-  <p class="hint">Click any city to auto-fill values</p>
+  <p class="hint"> Click any city to auto-fill values</p>
 </section>
 
-<!--  OFFCIAL DATA LINKS -->
+<!-- GOVERNMENT LINKS -->
 <section class="card">
-  <h2> Official Government Data Sources</h2>
+  <h2>🔗 Official Government Data Sources</h2>
 
   <ul class="links">
     <li>
@@ -82,7 +81,7 @@
     </li>
 
     <li>
-      Hazard (Rainfall/Floods):
+      Hazard Data:
       <a href="https://mausam.imd.gov.in/" target="_blank">IMD (Govt. of India)</a>
     </li>
 
@@ -98,7 +97,7 @@
   </ul>
 
   <p class="note">
-    These are official government websites. Use them to estimate values for your area.
+    Use these official sources to estimate accurate values.
   </p>
 </section>
 
