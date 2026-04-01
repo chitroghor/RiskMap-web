@@ -33,7 +33,7 @@ function calculateRisk() {
   }
 }
 
-// 🔥 CITY SELECT
+//  CITY SELECT
 function selectCity(pop, infra, cap) {
   document.getElementById("population").value = pop;
   document.getElementById("infra").value = infra;
