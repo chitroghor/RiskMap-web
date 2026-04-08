@@ -1,111 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RiskMap</title>
-<link rel="stylesheet" href="style.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RiskMap AI | Intelligent Disaster Response</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<nav class="navbar">RiskMap</nav>
+    <section id="auth-screen" class="screen active">
+        <div class="auth-bg"></div>
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="logo-badge">RISKMAP AI</div>
+                <h2>Welcome Back</h2>
+                <p id="auth-subtitle">Enter your mobile number to continue securely.</p>
+            </div>
 
-<header class="hero">
-  <h1>Disaster Risk Assessment</h1>
-  <p>Use real government-backed data for accurate insights</p>
-</header>
+            <div id="step-phone" class="auth-step active">
+                <div class="input-group">
+                    <span class="country-code">+91</span>
+                    <input type="tel" id="phone-input" placeholder="00000 00000" maxlength="10" autocomplete="off">
+                </div>
+                <button class="btn-primary" onclick="sendOTP()">Send Secure OTP</button>
+            </div>
 
-<!-- INPUT -->
-<section class="card">
-  <h2>Enter Area Data</h2>
+            <div id="step-otp" class="auth-step hidden">
+                <div class="otp-container">
+                    <input type="text" class="otp-box" maxlength="1" onkeyup="moveToNext(this, 'otp-2')">
+                    <input type="text" id="otp-2" class="otp-box" maxlength="1" onkeyup="moveToNext(this, 'otp-3')">
+                    <input type="text" id="otp-3" class="otp-box" maxlength="1" onkeyup="moveToNext(this, 'otp-4')">
+                    <input type="text" id="otp-4" class="otp-box" maxlength="1" onkeyup="verifyOTP()">
+                </div>
+                <button class="btn-primary" onclick="verifyOTP()" id="verify-btn">Verify & Login</button>
+                <button class="btn-text" onclick="resetAuth()">Change Number</button>
+            </div>
+        </div>
+    </section>
 
-  <label>Hazard Level</label>
-  <input type="range" id="hazard" min="0" max="100" value="50">
-  <span id="hazardValue">50</span>
+    <section id="app-screen" class="screen hidden">
+        <header class="top-bar">
+            <div class="alert-ticker">
+                <div class="ticker-content" id="alert-banner">
+                    🟢 SYSTEM ONLINE. FETCHING NDMA SENSOR DATA...
+                </div>
+            </div>
+        </header>
 
-  <input type="number" id="population" placeholder="Population Density (people/km²)">
-  <input type="number" id="infra" placeholder="Infrastructure Quality (1-100)">
-  <input type="number" id="capacity" placeholder="Drainage Capacity (1-100)">
+        <div id="map"></div>
 
-  <button onclick="calculateRisk()">Calculate Risk</button>
+        <div class="fab-container">
+            <button class="fab-btn" onclick="toggleModal('report-modal')" title="Report Incident">
+                <i data-lucide="megaphone"></i>
+            </button>
+            <button class="fab-btn ai-btn" onclick="toggleModal('ai-modal')" title="AI Survival Assistant">
+                <i data-lucide="bot"></i>
+            </button>
+        </div>
 
-  <h3 id="result">--</h3>
-</section>
+        <div id="bottom-sheet" class="bottom-sheet collapsed">
+            <div class="handle-area" onclick="toggleBottomSheet()">
+                <div class="handle"></div>
+            </div>
+            
+            <div class="sheet-content">
+                <div class="risk-status">
+                    <h3>Zone Status: <span id="risk-level" class="level-low">Safe</span></h3>
+                    <p>No immediate threats detected in your 5km radius.</p>
+                </div>
 
-<!-- CITY DATA TABLE -->
-<section class="card">
-  <h2>Example Data (Indian Cities)</h2>
+                <div class="quick-actions">
+                    <button class="action-card" onclick="findSafeRoute()">
+                        <div class="icon-circle green"><i data-lucide="navigation"></i></div>
+                        <span>Safe Route</span>
+                    </button>
+                    <button class="action-card" onclick="markSafe()">
+                        <div class="icon-circle blue"><i data-lucide="user-check"></i></div>
+                        <span>I'm Safe</span>
+                    </button>
+                </div>
 
-  <table>
-    <tr>
-      <th>City</th>
-      <th>Population Density</th>
-      <th>Infra Score</th>
-      <th>Drainage</th>
-    </tr>
+                <div class="sos-section">
+                    <button class="sos-btn-large" id="main-sos-btn" onclick="triggerSOS()">
+                        <div class="pulse-ring"></div>
+                        <span>SOS</span>
+                    </button>
+                    <p class="sos-hint">Tap to trigger emergency protocols</p>
+                </div>
+            </div>
+        </div>
 
-    <tr onclick="selectCity(11000,85,70)">
-      <td>Delhi</td><td>11000+</td><td>85</td><td>70</td>
-    </tr>
+        <div id="ai-modal" class="modal hidden">
+            <div class="modal-content glass">
+                <div class="modal-header">
+                    <h3><i data-lucide="sparkles"></i> AI Assistant</h3>
+                    <button onclick="toggleModal('ai-modal')" class="close-btn"><i data-lucide="x"></i></button>
+                </div>
+                <div id="chat-box" class="chat-body">
+                    <div class="msg bot">System online. I am your survival AI. Ask me about escape routes, first aid, or current disaster protocols.</div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="ai-input" placeholder="Type your situation..." onkeypress="handleAIEnter(event)">
+                    <button onclick="askAI()"><i data-lucide="send"></i></button>
+                </div>
+            </div>
+        </div>
 
-    <tr onclick="selectCity(20000,75,50)">
-      <td>Mumbai</td><td>20000+</td><td>75</td><td>50</td>
-    </tr>
+        <div id="report-modal" class="modal hidden">
+            <div class="modal-content glass">
+                <div class="modal-header">
+                    <h3>Community Report</h3>
+                    <button onclick="toggleModal('report-modal')" class="close-btn"><i data-lucide="x"></i></button>
+                </div>
+                <div class="modal-body">
+                    <label>Incident Type</label>
+                    <select id="report-type" class="custom-select">
+                        <option value="flood">🌊 Flash Flood</option>
+                        <option value="fire">🔥 Wildfire / Building Fire</option>
+                        <option value="earthquake">🏚️ Structural Collapse</option>
+                        <option value="medical">🚑 Medical Emergency</option>
+                    </select>
+                    <label>Details</label>
+                    <textarea id="report-desc" placeholder="Briefly describe the situation..." rows="3"></textarea>
+                    <button class="btn-primary full-width" onclick="submitReport()">Submit Live Report</button>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <tr onclick="selectCity(8000,80,75)">
-      <td>Bangalore</td><td>8000</td><td>80</td><td>75</td>
-    </tr>
-
-    <tr onclick="selectCity(26000,70,40)">
-      <td>Kolkata</td><td>26000+</td><td>70</td><td>40</td>
-    </tr>
-
-    <tr onclick="selectCity(7000,78,65)">
-      <td>Chennai</td><td>7000</td><td>78</td><td>65</td>
-    </tr>
-  </table>
-
-  <p class="hint"> </p>
-</section>
-
-<!-- GOVERNMENT LINKS -->
-<section class="card">
-  <h2> Official Government Data Sources</h2>
-
-  <ul class="links">
-    <li>
-      Population Data:
-      <a href="https://censusindia.gov.in/" target="_blank">Census India</a>
-    </li>
-
-    <li>
-      Hazard Data:
-      <a href="https://mausam.imd.gov.in/" target="_blank">IMD (Govt. of India)</a>
-    </li>
-
-    <li>
-      Infrastructure Data:
-      <a href="https://smartcities.gov.in/" target="_blank">Smart Cities Mission</a>
-    </li>
-
-    <li>
-      Drainage & Flood Reports:
-      <a href="https://ndma.gov.in/" target="_blank">NDMA</a>
-    </li>
-  </ul>
-
-  <p class="note">
-    Use these official sources to estimate accurate values.
-  </p>
-</section>
-
-<!-- REPORT -->
-<section class="report">
-  <button onclick="generateReport()">Download Full Report</button>
-</section>
-
-<script src="script.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
