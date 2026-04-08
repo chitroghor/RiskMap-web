@@ -1,6 +1,26 @@
-document.getElementById("hazard").oninput = function () {
-  document.getElementById("hazardValue").innerText = this.value;
+// ================= FIREBASE SETUP =================
+const firebaseConfig = {
+  apiKey: "AIzaSyBV0-f13_6hdRP_SKyIu0SPRdcEeQGX450",
+  authDomain: "riskmap-ai.firebaseapp.com",
+  projectId: "riskmap-ai",
+  storageBucket: "riskmap-ai.firebasestorage.app",
+  messagingSenderId: "11458794467",
+  appId: "1:11458794467:web:136ddc9c5607e6785e46d6",
+  measurementId: "G-LWMGT35WC8"
 };
+
+// Initialize Firebase and Database
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+// ==================================================
+
+// Safely wrap the hazard event listener so it doesn't break if the element is missing
+const hazardEl = document.getElementById("hazard");
+if (hazardEl) {
+    hazardEl.oninput = function () {
+        document.getElementById("hazardValue").innerText = this.value;
+    };
+}
 
 let lastDRI = 0;
 
@@ -14,6 +34,26 @@ function calculateRisk() {
     alert("Fill all inputs!");
     return;
   }
+  
+  let V = (pop / 100) + (100 - infra);
+  let DRI = (H * V) / cap;
+  lastDRI = DRI;
+
+  let result = document.getElementById("result");
+  if (result) {
+      if (DRI < 50) {
+        result.innerText = "Low Risk";
+        result.style.color = "green";
+      } else if (DRI < 150) {
+        result.innerText = "Medium Risk";
+        result.style.color = "orange";
+      } else {
+        result.innerText = "High Risk";
+        result.style.color = "red";
+      }
+  }
+}
+
 lucide.createIcons();
 
 // ================= AUTHENTICATION LOGIC =================
@@ -135,7 +175,7 @@ function simulateDisasters(lat, lng) {
         document.getElementById('risk-level').innerText = "Elevated Risk";
         document.getElementById('risk-level').className = "level-high";
         document.getElementById('risk-level').style.color = "var(--danger)";
-        document.getElementById('alert-banner').innerHTML = "🔴 WARNING: Wildfire detected nearby. Stay alert.";
+        document.getElementById('alert-banner').innerHTML = "⚠️ WARNING: Wildfire detected nearby. Stay alert.";
         document.getElementById('alert-banner').style.color = "var(--danger)";
         document.getElementById('bottom-sheet').classList.remove('collapsed');
     }, 3000);
@@ -191,7 +231,7 @@ function markSafe() {
 // Action: SOS Trigger
 function triggerSOS() {
     const btn = document.getElementById('main-sos-btn');
-    const confirmSOS = confirm("🚨 TRIGGER EMERGENCY PROTOCOL? This dispatches local authorities to your live GPS coordinates.");
+    const confirmSOS = confirm("⚠️ TRIGGER EMERGENCY PROTOCOL? This dispatches local authorities to your live GPS coordinates.");
     
     if (confirmSOS) {
         btn.style.background = "#fff";
@@ -201,16 +241,41 @@ function triggerSOS() {
     }
 }
 
-// Action: Community Report
+// Action: Community Report (Saves directly to Firebase Database)
 function submitReport() {
-    const type = document.getElementById('report-type');
+    const typeElement = document.getElementById('report-type');
+    const type = typeElement.options[typeElement.selectedIndex].text;
     const desc = document.getElementById('report-desc').value;
     
-    if(!desc) { alert("Please provide details."); return; }
+    if(!desc) { 
+        alert("Please provide details."); 
+        return; 
+    }
 
-    alert(`Incident [${type.options[type.selectedIndex].text}] logged securely.`);
-    document.getElementById('report-desc').value = "";
-    toggleModal('report-modal');
+    // Change button text to show it's working
+    const btn = document.querySelector('#report-modal .btn-primary');
+    btn.innerHTML = "Sending to Cloud...";
+    btn.style.opacity = "0.7";
+
+    // Send data to Firebase Firestore
+    db.collection("reports").add({
+        incidentType: type,
+        description: desc,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    })
+    .then(() => {
+        alert("Incident logged securely to RiskMap AI Cloud!");
+        document.getElementById('report-desc').value = "";
+        btn.innerHTML = "Submit Live Report";
+        btn.style.opacity = "1";
+        toggleModal('report-modal');
+    })
+    .catch((error) => {
+        console.error("Firebase Error:", error);
+        alert("Error saving report. Check your internet connection.");
+        btn.innerHTML = "Submit Live Report";
+        btn.style.opacity = "1";
+    });
 }
 
 // ================= AI ASSISTANT =================
@@ -238,29 +303,15 @@ function askAI() {
         chatBox.scrollTop = chatBox.scrollHeight;
     }, 800);
 }
-  let V = (pop / 100) + (100 - infra);
-  let DRI = (H * V) / cap;
-  lastDRI = DRI;
-
-  let result = document.getElementById("result");
-
-  if (DRI < 50) {
-    result.innerText = "Low Risk";
-    result.style.color = "green";
-  } else if (DRI < 150) {
-    result.innerText = "Medium Risk";
-    result.style.color = "orange";
-  } else {
-    result.innerText = "High Risk";
-    result.style.color = "red";
-  }
-}
 
 //  CITY SELECT
 function selectCity(pop, infra, cap) {
-  document.getElementById("population").value = pop;
-  document.getElementById("infra").value = infra;
-  document.getElementById("capacity").value = cap;
+  let popEl = document.getElementById("population");
+  let infraEl = document.getElementById("infra");
+  let capEl = document.getElementById("capacity");
+  if(popEl) popEl.value = pop;
+  if(infraEl) infraEl.value = infra;
+  if(capEl) capEl.value = cap;
 }
 
 function fillSample() {
